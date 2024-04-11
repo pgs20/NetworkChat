@@ -8,6 +8,10 @@ public class Server {
     private ServerSocket serverSocket;
     private int port;
 
+    public int getPort() {
+        return port;
+    }
+
     public Server() {
         try {
             BufferedReader br = new BufferedReader(new FileReader("settings.txt"));
@@ -60,12 +64,9 @@ public class Server {
                     System.out.println("Message from '" + username + "': " + message);
 
                     // Save message to log file
-                    BufferedWriter logWriter = new BufferedWriter(new FileWriter("log.txt", true));
+                    BufferedWriter logWriter = new BufferedWriter(new FileWriter("log_server.txt", true));
                     logWriter.write(username + " " + new Date() + ": " + message + "\n");
                     logWriter.close();
-
-                    // Echo message back to client
-                    out.println("Message received: " + message);
                 }
             } catch (IOException e) {
                 e.printStackTrace();

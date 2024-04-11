@@ -2,6 +2,7 @@ package client;
 
 import java.io.*;
 import java.net.*;
+import java.util.Date;
 import java.util.Scanner;
 
 public class Client {
@@ -35,6 +36,10 @@ public class Client {
             while (true) {
                 message = scanner.nextLine();
                 out.println(message);
+
+                BufferedWriter logWriter = new BufferedWriter(new FileWriter("log_client.txt", true));
+                logWriter.write(username + " " + new Date() + ": " + message + "\n");
+                logWriter.close();
 
                 if ("/exit".equals(message)) {
                     break;

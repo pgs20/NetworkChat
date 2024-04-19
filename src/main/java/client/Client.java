@@ -26,6 +26,19 @@ public class Client {
     }
 
     public void start() {
+        Thread receiveThread = new Thread(() -> {
+            try {
+                String message;
+                while ((message = in.readLine()) != null) {
+                    System.out.println(message);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        receiveThread.start();
+
         try {
             Scanner scanner = new Scanner(System.in);
             System.out.print("Enter your username: ");
@@ -37,7 +50,7 @@ public class Client {
                 message = scanner.nextLine();
                 out.println(message);
 
-                BufferedWriter logWriter = new BufferedWriter(new FileWriter("log_client.txt", true));
+                BufferedWriter logWriter = new BufferedWriter(new FileWriter("log_client_" + username + ".txt", true));
                 logWriter.write(username + " " + new Date() + ": " + message + "\n");
                 logWriter.close();
 
@@ -51,10 +64,5 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public static void main(String[] args) {
-        Client client = new Client();
-        client.start();
     }
 }

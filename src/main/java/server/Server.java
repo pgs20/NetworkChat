@@ -2,15 +2,14 @@ package server;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Server {
     private ServerSocket serverSocket;
     private int port;
-
-    public int getPort() {
-        return port;
-    }
+    private List<ClientHandler> clients = new ArrayList<>();
 
     public Server() {
         try {
@@ -31,12 +30,17 @@ public class Server {
                 System.out.println("New client connected: " + socket);
 
                 ClientHandler clientHandler = new ClientHandler(socket);
+                clients.add(clientHandler);
                 Thread thread = new Thread(clientHandler);
                 thread.start();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    public int getPort() {
+        return port;
     }
 
     private class ClientHandler implements Runnable {
@@ -63,19 +67,24 @@ public class Server {
                 while ((message = in.readLine()) != null) {
                     System.out.println("Message from '" + username + "': " + message);
 
-                    // Save message to log file
                     BufferedWriter logWriter = new BufferedWriter(new FileWriter("log_server.txt", true));
                     logWriter.write(username + " " + new Date() + ": " + message + "\n");
                     logWriter.close();
+
+                    for (ClientHandler client : clients) {
+                        if (client != this) {
+                            client.sendMessage(username, message);
+                        }
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-    }
 
-    public static void main(String[] args) {
-        Server server = new Server();
-        server.start();
+        public void sendMessage(String username, String message) {
+            out.println(username + ": " + message);
+        }
     }
 }
+
